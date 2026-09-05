@@ -1,0 +1,6 @@
+{
+  "name": "Gate & Ledger",
+  "description": "Agentic pre-production pipeline manager for film crews powered by Gemini and ClickHouse registry verification",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
