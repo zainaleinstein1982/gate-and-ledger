@@ -17,6 +17,7 @@ import {
   Scene,
   ShotCard,
 } from '../src/types';
+import { createClient, type ClickHouseClient } from '@clickhouse/client';
 
 export interface ClickHouseQueryResult<T = any> {
   meta: Array<{ name: string; type: string }>;
@@ -32,6 +33,7 @@ export interface ClickHouseQueryResult<T = any> {
 
 class ClickHouseRegistryStore {
   private isCloudConfigured: boolean = false;
+  private client: ClickHouseClient | null = null;
   private cloudHost: string = '';
   private cloudPort: string = '8443';
   private cloudUser: string = 'default';
@@ -67,6 +69,22 @@ class ClickHouseRegistryStore {
       (this.cloudHost.includes('.') || this.cloudHost === 'localhost' || this.cloudHost === '127.0.0.1')
     );
     this.isCloudConfigured = hasValidHost;
+
+    if (hasValidHost) {
+      try {
+        const protocol = this.cloudPort === '8443' || this.cloudHost.includes('clickhouse.cloud') ? 'https' : 'http';
+        this.client = createClient({
+          url: `${protocol}://${this.cloudHost}:${this.cloudPort}`,
+          username: this.cloudUser,
+          password: this.cloudPassword,
+          database: this.cloudDatabase,
+          request_timeout: 5000,
+        });
+      } catch (clientErr) {
+        console.warn('Could not initialize ClickHouse client instance:', clientErr);
+        this.client = null;
+      }
+    }
   }
 
   public getStatus() {
@@ -682,8 +700,29 @@ class ClickHouseRegistryStore {
     const startTime = performance.now();
     const cleanSql = sql.trim().replace(/;+$/, '');
 
-    // If Cloud credentials present, attempt Cloud query first
-    if (this.isCloudConfigured) {
+    // If Cloud credentials present, attempt Cloud query via official SDK client first
+    if (this.client) {
+      try {
+        const resultSet = await this.client.query({
+          query: cleanSql,
+          format: 'JSON',
+        });
+        const json: any = await resultSet.json();
+        return {
+          meta: json.meta || [],
+          data: json.data || [],
+          rows: json.rows || (json.data ? json.data.length : 0),
+          statistics: json.statistics || {
+            elapsed: (performance.now() - startTime) / 1000,
+            rows_read: json.rows || 0,
+            bytes_read: JSON.stringify(json).length,
+          },
+          raw_sql: sql,
+        };
+      } catch (err) {
+        console.warn('ClickHouse SDK client query fallback to embedded engine:', err);
+      }
+    } else if (this.isCloudConfigured) {
       try {
         const url = `https://${this.cloudHost}:${this.cloudPort}/?database=${encodeURIComponent(this.cloudDatabase)}&default_format=JSON`;
         const headers: Record<string, string> = {
@@ -713,11 +752,8 @@ class ClickHouseRegistryStore {
             },
             raw_sql: sql,
           };
-        } else {
-          this.isCloudConfigured = false;
         }
       } catch (err) {
-        this.isCloudConfigured = false;
         console.warn('ClickHouse Cloud query fallback to embedded engine:', err);
       }
     }

@@ -236,7 +236,7 @@ export const RegistryPanel: React.FC<RegistryPanelProps> = ({
                     <td className="py-3 px-4 text-right">
                       {row.lock_state === 'locked' ? (
                         <button
-                          onClick={() => handleStateChange(row.row_id, 'in_review')}
+                          onClick={() => handleStateChange(row.row_id, 'unlocked')}
                           disabled={updatingId === row.row_id}
                           className="px-2.5 py-1 rounded bg-[#162d64] border border-[#274f9e] text-slate-200 hover:text-white text-[11px] cursor-pointer"
                         >

@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   STAGES,
   Scene,
-  StageId,
 } from '../types';
 import { api } from '../api';
+import { CINEMATIC_PLATES } from '../utils/cinematicVisuals';
 import {
   Play,
   Pause,
@@ -19,6 +19,13 @@ import {
   Sliders,
   Volume2,
   VolumeX,
+  Camera,
+  Layers,
+  Scissors,
+  Brush,
+  SlidersHorizontal,
+  Award,
+  CheckCircle2,
 } from 'lucide-react';
 
 interface DemoSimulationViewProps {
@@ -96,7 +103,7 @@ export const DemoSimulationView: React.FC<DemoSimulationViewProps> = ({
           }
           return prev + 1;
         });
-      }, 4000);
+      }, 3500);
     }
     return () => clearInterval(timer);
   }, [isPlaying]);
@@ -135,17 +142,18 @@ export const DemoSimulationView: React.FC<DemoSimulationViewProps> = ({
   };
 
   return (
-    <div className="space-y-6 text-neutral-200">
+    <div className="space-y-6 text-slate-100">
       {/* Top Header */}
-      <div className="border-b border-neutral-800 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="bg-[#0b1636] border border-[#1d3570] rounded-2xl p-5 shadow-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <div className="text-xs font-mono uppercase tracking-wider text-neutral-400">
+          <div className="text-[11px] font-mono uppercase tracking-widest text-[#38bdf8]">
             DEMO SIMULATION WALKTHROUGH
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">
-            Scene 12: &quot;Extraction Beacon&quot; (11-Stage Progression)
+          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+            <Film className="w-6 h-6 text-[#f59e0b]" />
+            <span>Scene 12: &quot;Extraction Beacon&quot; (11-Stage Progression)</span>
           </h1>
-          <p className="text-xs text-neutral-300 mt-1 max-w-2xl">
+          <p className="text-xs text-slate-300 mt-1 max-w-2xl">
             Step through all 11 stages of the cinema pipeline from script breakdown to DCP master packaging.
           </p>
         </div>
@@ -153,9 +161,9 @@ export const DemoSimulationView: React.FC<DemoSimulationViewProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#e5a93c] text-neutral-950 font-semibold text-xs uppercase tracking-wider hover:bg-[#d4972e] transition-colors cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-neutral-950 font-bold text-xs uppercase tracking-wider hover:brightness-110 shadow-lg shadow-amber-500/20 transition-all cursor-pointer"
           >
-            {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+            {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
             <span>{isPlaying ? 'Pause Auto-Play' : 'Auto-Play 11 Stages'}</span>
           </button>
 
@@ -164,7 +172,7 @@ export const DemoSimulationView: React.FC<DemoSimulationViewProps> = ({
               setCurrentStageId(1);
               handleAdvanceToStage(1);
             }}
-            className="p-1.5 rounded border border-neutral-700 hover:bg-neutral-800 text-neutral-300 transition-colors cursor-pointer"
+            className="p-2 rounded-xl border border-[#22458a] bg-[#0e1f48] hover:bg-[#152a5c] text-slate-300 hover:text-white transition-colors cursor-pointer"
             title="Reset to Stage 1"
           >
             <RotateCcw className="w-4 h-4" />
@@ -173,7 +181,7 @@ export const DemoSimulationView: React.FC<DemoSimulationViewProps> = ({
       </div>
 
       {/* Stage Number Stepper Bar */}
-      <div className="border border-neutral-800 bg-neutral-900/40 p-3 rounded flex items-center justify-between gap-2 overflow-x-auto">
+      <div className="border border-[#1b3469] bg-[#0b1636] p-3 rounded-2xl flex items-center justify-between gap-2 overflow-x-auto shadow-lg">
         <div className="flex items-center gap-1.5">
           {STAGES.map((s) => {
             const isCurrent = s.id === currentStageId;
@@ -185,12 +193,12 @@ export const DemoSimulationView: React.FC<DemoSimulationViewProps> = ({
                   setCurrentStageId(s.id);
                   handleAdvanceToStage(s.id);
                 }}
-                className={`px-2.5 py-1 text-xs font-mono rounded transition-colors cursor-pointer ${
+                className={`px-3 py-1.5 text-xs font-mono rounded-xl transition-all cursor-pointer ${
                   isCurrent
-                    ? 'bg-[#e5a93c] text-neutral-950 font-bold'
+                    ? 'bg-[#38bdf8] text-black font-extrabold shadow-lg shadow-sky-500/30 ring-2 ring-[#38bdf8]'
                     : isCompleted
-                    ? 'border border-neutral-700 text-neutral-200 bg-neutral-900/80 hover:bg-neutral-800'
-                    : 'text-neutral-500 hover:text-neutral-300'
+                    ? 'border border-[#23458a] text-slate-200 bg-[#0e1f48] hover:bg-[#142654]'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 {s.id}
@@ -209,13 +217,13 @@ export const DemoSimulationView: React.FC<DemoSimulationViewProps> = ({
               }
             }}
             disabled={currentStageId <= 1}
-            className="p-1 border border-neutral-700 rounded hover:bg-neutral-800 disabled:opacity-30 cursor-pointer"
+            className="p-1.5 border border-[#22458a] rounded-xl hover:bg-[#152a5c] text-slate-300 disabled:opacity-30 cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
 
-          <span className="text-neutral-400">
-            {currentStageId} of 11
+          <span className="text-slate-300 font-bold px-1">
+            Stage {currentStageId} / 11
           </span>
 
           <button
@@ -227,7 +235,7 @@ export const DemoSimulationView: React.FC<DemoSimulationViewProps> = ({
               }
             }}
             disabled={currentStageId >= 11}
-            className="p-1 border border-neutral-700 rounded hover:bg-neutral-800 disabled:opacity-30 cursor-pointer"
+            className="p-1.5 border border-[#22458a] rounded-xl hover:bg-[#152a5c] text-slate-300 disabled:opacity-30 cursor-pointer"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -235,20 +243,20 @@ export const DemoSimulationView: React.FC<DemoSimulationViewProps> = ({
       </div>
 
       {/* Stage Detail Card */}
-      <div className="border border-neutral-800 bg-neutral-900/30 p-5 rounded space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-neutral-800 pb-3">
+      <div className="border border-[#1e3870] bg-[#0c183a] p-5 rounded-2xl shadow-xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#162a56] pb-3">
           <div>
-            <span className="text-xs font-mono uppercase tracking-wider text-neutral-400">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#38bdf8]">
               {currentStageConfig.phase.replace('_', ' ')}
             </span>
-            <h2 className="text-lg font-bold text-white">
-              Stage {currentStageConfig.id}: {currentStageConfig.name}
+            <h2 className="text-xl font-bold text-white flex items-center gap-2 mt-0.5">
+              <span>Stage {currentStageConfig.id}: {currentStageConfig.name}</span>
             </h2>
-            <p className="text-xs text-neutral-300 mt-0.5">{currentStageConfig.description}</p>
+            <p className="text-xs text-slate-300 mt-0.5">{currentStageConfig.description}</p>
           </div>
 
           {currentStageConfig.skillCommand && (
-            <span className="font-mono text-xs border border-neutral-700 text-neutral-300 px-2.5 py-1 rounded bg-neutral-900/60 self-start sm:self-auto">
+            <span className="font-mono text-xs border border-[#22458a] text-[#38bdf8] px-3 py-1 rounded-xl bg-[#0e1f48] self-start sm:self-auto">
               {currentStageConfig.skillCommand}
             </span>
           )}
@@ -256,49 +264,49 @@ export const DemoSimulationView: React.FC<DemoSimulationViewProps> = ({
 
         {/* Dynamic Simulation Content Based on Stage */}
         {currentStageId === 1 && (
-          <div className="space-y-3 text-xs font-mono">
-            <div className="text-neutral-400">AUTOMATED SCRIPT SHOT DECOMPOSITION:</div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="p-3 bg-neutral-950 border border-neutral-800 rounded">
-                <div className="text-white font-bold">SHOT 01 — SUBTERRANEAN COOLANT VOID</div>
-                <div className="text-neutral-400 mt-1">Extreme wide shot. Perforated steel walkway over cooling reservoir.</div>
-                <div className="text-neutral-500 mt-1 text-[11px]">Lens: 35mm Vintage Anamorphic T2.2</div>
-              </div>
-              <div className="p-3 bg-neutral-950 border border-neutral-800 rounded">
-                <div className="text-white font-bold">SHOT 02 — APPROACHING CONSOLE</div>
-                <div className="text-neutral-400 mt-1">Medium tracking. Elena walks briskly past venting high-pressure steam conduits.</div>
-                <div className="text-neutral-500 mt-1 text-[11px]">Lens: 50mm Anamorphic T2.0</div>
-              </div>
-              <div className="p-3 bg-neutral-950 border border-neutral-800 rounded">
-                <div className="text-white font-bold">SHOT 03 — EMERGENCY TRANSPONDER ENGAGED</div>
-                <div className="text-neutral-400 mt-1">Close-up. Elena slams the yellow dual-toggle switch; amber strobe illuminates.</div>
-                <div className="text-neutral-500 mt-1 text-[11px]">Lens: 75mm Anamorphic Close-Focus</div>
-              </div>
-              <div className="p-3 bg-neutral-950 border border-neutral-800 rounded">
-                <div className="text-white font-bold">SHOT 04 — ALARM OSCILLATION PROFILE</div>
-                <div className="text-neutral-400 mt-1">Profile ECU. Sodium yellow strobe sweeps across Elena&apos;s titanium graft.</div>
-                <div className="text-neutral-500 mt-1 text-[11px]">Lens: 85mm Anamorphic Macro</div>
-              </div>
+          <div className="space-y-3">
+            <div className="text-xs font-mono text-slate-300 font-bold">AUTOMATED SCRIPT SHOT DECOMPOSITION:</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {[
+                { title: 'SHOT 01 — COOLANT VOID', lens: '35mm Anamorphic', img: CINEMATIC_PLATES.shot1_wide },
+                { title: 'SHOT 02 — STEAM TRACKING', lens: '50mm Primes', img: CINEMATIC_PLATES.shot2_medium },
+                { title: 'SHOT 03 — TRANSPONDER SLAM', lens: '75mm Close-Focus', img: CINEMATIC_PLATES.shot3_macro },
+                { title: 'SHOT 04 — ALARM PROFILE', lens: '85mm Macro ECU', img: CINEMATIC_PLATES.shot4_alarm },
+              ].map((shot, i) => (
+                <div key={i} className="rounded-xl overflow-hidden border border-[#1b3469] bg-[#08122d]">
+                  <div className="aspect-[16/9] bg-black">
+                    <img src={shot.img} alt={shot.title} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="p-2.5">
+                    <div className="text-xs font-bold text-white truncate">{shot.title}</div>
+                    <div className="text-[10px] text-[#38bdf8] font-mono">{shot.lens}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
         {currentStageId === 2 && (
           <div className="space-y-3">
-            <div className="text-xs font-mono text-neutral-400">
+            <div className="text-xs font-mono text-slate-300 font-bold">
               SPECIFICATION RESEARCH BOARDS GENERATED WITH GEMINI:
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { title: 'Dr. Elena Vance', desc: 'Titanium prosthetic graft, graphite suit' },
-                { title: 'Emergency Transponder', desc: 'Safety-yellow dual toggle switch' },
-                { title: 'Catwalk Gantry', desc: 'Perforated grating, steam conduits' },
-                { title: '35mm Anamorphic Spec', desc: 'Horizontal blue flare suppression' },
+                { title: 'Dr. Elena Vance', desc: 'Character Anchor', img: CINEMATIC_PLATES.elena_concept },
+                { title: 'Emergency Transponder', desc: 'Prop Spec', img: CINEMATIC_PLATES.transponder_prop },
+                { title: 'Catwalk Gantry', desc: 'Location Plate', img: CINEMATIC_PLATES.catwalk_environment },
+                { title: '35mm Anamorphic Spec', desc: 'Optical Specimen', img: CINEMATIC_PLATES.lens_specimen },
               ].map((item, idx) => (
-                <div key={idx} className="p-3 bg-neutral-950 border border-neutral-800 rounded space-y-1">
-                  <div className="text-xs font-bold text-white font-mono">{item.title}</div>
-                  <div className="text-[11px] text-neutral-400">{item.desc}</div>
-                  <div className="text-[10px] text-neutral-500 font-mono pt-1">Model: imagen-3.0-generate-002</div>
+                <div key={idx} className="rounded-xl overflow-hidden border border-[#1b3469] bg-[#08122d]">
+                  <div className="aspect-square bg-black">
+                    <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="p-2.5">
+                    <div className="text-xs font-bold text-white font-mono">{item.title}</div>
+                    <div className="text-[10px] text-slate-400">{item.desc}</div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -306,36 +314,52 @@ export const DemoSimulationView: React.FC<DemoSimulationViewProps> = ({
         )}
 
         {currentStageId === 3 && (
-          <div className="space-y-3 text-xs font-mono">
-            <div className="flex items-center justify-between text-neutral-400">
-              <span>GATE A EVALUATION (ALL BOARDS MUST CARRY ATTRIBUTABLE DECISIONS):</span>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-xs font-mono text-slate-300 font-bold">
+              <span>VISUAL BIBLE WRITTEN DECISIONS (GATE A CHECK):</span>
               <button
                 onClick={handleRunGateACheck}
-                className="px-2.5 py-1 rounded border border-neutral-700 bg-neutral-900 text-neutral-300 hover:bg-neutral-800 cursor-pointer"
+                className="px-3 py-1 rounded-lg bg-[#162d64] border border-[#274f9e] text-[#38bdf8] text-xs hover:bg-[#1a3575] cursor-pointer"
               >
-                {gateACheck.loading ? 'Checking...' : 'Run Gate A SQL Query'}
+                {gateACheck.loading ? 'Evaluating...' : 'Query Gate A Invariant'}
               </button>
             </div>
-            <pre className="p-3 bg-neutral-950 border border-neutral-800 rounded text-neutral-300">
-              {gateACheck.query}
-            </pre>
-            <div className="p-3 bg-neutral-950 border border-neutral-800 rounded flex items-center justify-between">
-              <span>CLICKHOUSE RESULT: 0 UNASSIGNED BOARDS</span>
-              <span className="text-[#e5a93c] flex items-center gap-1 font-bold">
-                <Check className="w-4 h-4" /> GATE A PASSED
-              </span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {[
+                { title: 'Board #1: INT. CATWALK ENTRY', lens: '35mm T2.2 Anamorphic', img: CINEMATIC_PLATES.shot1_wide },
+                { title: 'Board #2: CONDENSER MIST PROFILE', lens: '50mm T2.0 Primes', img: CINEMATIC_PLATES.shot2_medium },
+                { title: 'Board #3: EMERGENCY SWITCH SLAM', lens: '75mm Macro', img: CINEMATIC_PLATES.shot3_macro },
+              ].map((b, i) => (
+                <div key={i} className="rounded-xl overflow-hidden border border-[#1b3469] bg-[#08122d]">
+                  <div className="aspect-[16/9] bg-black relative">
+                    <img src={b.img} alt={b.title} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <div className="border-2 border-emerald-400 text-emerald-400 font-black text-[10px] px-2 py-0.5 rounded rotate-[-12deg] bg-black/70 flex items-center gap-1">
+                        <Check className="w-3 h-3 stroke-[3]" />
+                        <span>APPROVED</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-2.5">
+                    <div className="text-xs font-bold text-white">{b.title}</div>
+                    <div className="text-[10px] text-[#38bdf8] font-mono">{b.lens}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
         {currentStageId === 4 && (
-          <div className="space-y-3 text-xs font-mono">
-            <div className="text-neutral-400">5-POSE NEUTRAL GREY MODEL TURNAROUND SHEET:</div>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
-              {['Front (0°)', '3/4 Left (45°)', 'Profile (90°)', '3/4 Right (315°)', 'Back (180°)'].map((p, i) => (
-                <div key={i} className="p-3 bg-neutral-950 border border-neutral-800 rounded">
-                  <div className="text-white font-bold">{p}</div>
-                  <div className="text-[10px] text-neutral-500 mt-1">18% Grey Studio Light</div>
+          <div className="space-y-3">
+            <div className="text-xs font-mono text-slate-300 font-bold">5-POSE NEUTRAL GREY MODEL SHEET:</div>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              {['Front (0°)', '3/4 Left (45°)', 'Profile (90°)', '3/4 Right (315°)', 'Rear (180°)'].map((pose, i) => (
+                <div key={i} className="rounded-xl overflow-hidden border border-[#1b3469] bg-[#222530] p-2 text-center">
+                  <div className="aspect-[3/4] flex items-center justify-center">
+                    <img src={CINEMATIC_PLATES.elena_concept} alt={pose} className="w-full h-full object-contain" />
+                  </div>
+                  <div className="text-[11px] font-bold text-white mt-1">{pose}</div>
                 </div>
               ))}
             </div>
@@ -343,79 +367,149 @@ export const DemoSimulationView: React.FC<DemoSimulationViewProps> = ({
         )}
 
         {currentStageId === 5 && (
-          <div className="space-y-3 text-xs font-mono">
-            <div className="flex items-center justify-between text-neutral-400">
-              <span>GATE B EVALUATION (NO ROW, NO RENDER):</span>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-xs font-mono text-slate-300 font-bold">
+              <span>COMBAT MATRIX STRESS-TEST (GATE B CHECK):</span>
               <button
                 onClick={handleRunGateBCheck}
-                className="px-2.5 py-1 rounded border border-neutral-700 bg-neutral-900 text-neutral-300 hover:bg-neutral-800 cursor-pointer"
+                className="px-3 py-1 rounded-lg bg-[#162d64] border border-[#274f9e] text-emerald-400 text-xs hover:bg-[#1a3575] cursor-pointer"
               >
-                {gateBCheck.loading ? 'Checking...' : 'Run Gate B SQL Query'}
+                {gateBCheck.loading ? 'Evaluating...' : 'Query Gate B Invariant'}
               </button>
             </div>
-            <pre className="p-3 bg-neutral-950 border border-neutral-800 rounded text-neutral-300">
-              {gateBCheck.query}
-            </pre>
-            <div className="p-3 bg-neutral-950 border border-neutral-800 rounded flex items-center justify-between">
-              <span>CLICKHOUSE RESULT: 3 OF 3 TOUCHING ROWS LOCKED</span>
-              <span className="text-[#e5a93c] flex items-center gap-1 font-bold">
-                <Check className="w-4 h-4" /> GATE B PASSED
-              </span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { title: 'Sodium Strobe', score: '10/10 PASS', img: CINEMATIC_PLATES.shot4_alarm },
+                { title: 'Motion Blur', score: '10/10 PASS', img: CINEMATIC_PLATES.shot2_medium },
+                { title: 'Two-Shot Depth', score: '10/10 PASS', img: CINEMATIC_PLATES.shot1_wide },
+                { title: 'Condensation', score: '10/10 PASS', img: CINEMATIC_PLATES.shot3_macro },
+              ].map((m, i) => (
+                <div key={i} className="rounded-xl overflow-hidden border border-[#1b3469] bg-[#08122d]">
+                  <div className="aspect-[4/3] bg-black">
+                    <img src={m.img} alt={m.title} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="p-2 flex items-center justify-between text-[11px]">
+                    <span className="font-bold text-white">{m.title}</span>
+                    <span className="text-emerald-400 font-mono font-bold">{m.score}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
         {currentStageId === 6 && (
           <div className="space-y-3">
-            <div className="text-xs font-mono text-neutral-400 flex items-center justify-between">
-              <span>VEO VIDEO GENERATION (GOOGLE GENAI):</span>
-              <span className="border border-neutral-700 text-neutral-300 px-2 py-0.5 rounded text-[11px]">
-                Pre-rendered demo clip — live Veo generation requires billing
-              </span>
+            <div className="text-xs font-mono text-slate-300 font-bold">
+              HIGH-END CINEMA CAMERA VIEWFINDER &amp; VIDEO PLAYBACK:
             </div>
-
-            <div className="aspect-[16/9] w-full bg-black rounded overflow-hidden relative border border-neutral-800">
+            <div className="rounded-2xl border border-[#23458a] bg-black overflow-hidden relative aspect-[16/9] max-h-[320px]">
               <video
-                ref={videoRef}
                 src="/assets/demo_scene_12_veo_clip.mp4"
                 playsInline
                 autoPlay
                 loop
-                muted={isMuted}
+                muted
                 className="w-full h-full object-contain"
               />
-              <div className="absolute bottom-3 left-3 flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    if (videoRef.current) {
-                      videoRef.current.muted = !isMuted;
-                      setIsMuted(!isMuted);
-                    }
-                  }}
-                  className="p-1.5 rounded bg-neutral-950/80 border border-neutral-700 text-white cursor-pointer"
-                >
-                  {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-                </button>
+              <div className="absolute top-3 left-3 bg-black/60 px-2 py-0.5 rounded text-[10px] font-mono text-red-500 border border-red-500/40 font-bold">
+                REC ● 24.000 FPS
+              </div>
+              <div className="absolute bottom-3 right-3 bg-black/60 px-2 py-0.5 rounded text-[10px] font-mono text-amber-400 border border-white/20">
+                2.39:1 ANAMORPHIC
               </div>
             </div>
           </div>
         )}
 
-        {currentStageId >= 7 && (
-          <div className="space-y-3 text-xs font-mono">
-            <div className="text-neutral-400">
-              {currentStageId === 7 && 'PARALLEL EDITORIAL ASSEMBLY: Assembly cut assembled while next scene generates.'}
-              {currentStageId === 8 && 'DIGITAL CLEANUP: Artifact punch-list resolved shot-by-shot.'}
-              {currentStageId === 9 && 'COLOR GRADING: Human colorist unified ACEScc exposure and sodium grading.'}
-              {currentStageId === 10 && 'POST SOUND: Human audio team -23 LUFS platform loudness mix.'}
-              {currentStageId === 11 && 'MASTER PACKAGING: Festival DCP and ProRes 4444 XQ archival package certified.'}
+        {currentStageId === 7 && (
+          <div className="space-y-3">
+            <div className="text-xs font-mono text-slate-300 font-bold">EDITORIAL NLE TIMELINE:</div>
+            <div className="p-3 bg-[#08122d] border border-[#1b3469] rounded-xl space-y-2">
+              <div className="grid grid-cols-4 gap-2">
+                {[
+                  { name: 'Shot 01 (Wide)', img: CINEMATIC_PLATES.shot1_wide },
+                  { name: 'Shot 02 (Tracking)', img: CINEMATIC_PLATES.shot2_medium },
+                  { name: 'Shot 03 (Macro)', img: CINEMATIC_PLATES.shot3_macro },
+                  { name: 'Shot 04 (Alarm)', img: CINEMATIC_PLATES.shot4_alarm },
+                ].map((c, i) => (
+                  <div key={i} className="aspect-[16/9] bg-black rounded overflow-hidden border border-[#23458a]">
+                    <img src={c.img} alt={c.name} className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+              <div className="h-6 bg-[#040817] rounded flex items-center px-2 gap-0.5 overflow-hidden">
+                {Array.from({ length: 48 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex-1 bg-[#38bdf8]/60 rounded-full"
+                    style={{ height: `${Math.sin(i * 0.5) * 50 + 40}%` }}
+                  />
+                ))}
+              </div>
             </div>
+          </div>
+        )}
 
-            <div className="p-3 bg-neutral-950 border border-neutral-800 rounded flex items-center justify-between">
-              <span>STATUS: COMPLETE</span>
-              <span className="text-[#e5a93c] flex items-center gap-1 font-bold">
-                <Check className="w-3.5 h-3.5" /> VERIFIED IN CLICKHOUSE
-              </span>
+        {currentStageId === 8 && (
+          <div className="space-y-3">
+            <div className="text-xs font-mono text-slate-300 font-bold">DIGITAL INPAINTING CLEANUP:</div>
+            <div className="rounded-xl border border-[#1b3469] bg-black overflow-hidden aspect-[16/9] max-h-[300px] relative flex items-center justify-center">
+              <img src={CINEMATIC_PLATES.shot2_medium} alt="Cleanup plate" className="w-full h-full object-contain" />
+              <div className="absolute top-3 left-3 bg-emerald-500 text-black font-bold text-[10px] font-mono px-2 py-0.5 rounded shadow">
+                CLEANED &amp; INPAINTED MASTER
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentStageId === 9 && (
+          <div className="space-y-3">
+            <div className="text-xs font-mono text-slate-300 font-bold">ACES 1.3 THEATRICAL COLOR GRADING:</div>
+            <div className="rounded-xl border border-[#1b3469] bg-black overflow-hidden aspect-[16/9] max-h-[300px] relative flex items-center justify-center">
+              <img
+                src={CINEMATIC_PLATES.shot1_wide}
+                alt="Color plate"
+                style={{ filter: 'sepia(0.4) saturate(1.4) contrast(1.2)' }}
+                className="w-full h-full object-contain"
+              />
+              <div className="absolute top-3 left-3 bg-[#38bdf8] text-black font-bold text-[10px] font-mono px-2 py-0.5 rounded shadow">
+                LUT: SODIUM AMBER &amp; TEAL
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentStageId === 10 && (
+          <div className="space-y-3">
+            <div className="text-xs font-mono text-slate-300 font-bold">POST-SOUND STUDIO &amp; -23 LUFS RADAR:</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="p-3 bg-[#08122d] border border-[#1b3469] rounded-xl flex items-end justify-between gap-1 h-36">
+                {Array.from({ length: 24 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex-1 bg-gradient-to-t from-[#0284c7] via-[#38bdf8] to-[#f59e0b] rounded-t-sm"
+                    style={{ height: `${(Math.sin(i * 0.4) * 0.4 + 0.5) * 85}%` }}
+                  />
+                ))}
+              </div>
+              <div className="p-3 bg-[#08122d] border border-[#1b3469] rounded-xl flex flex-col items-center justify-center space-y-1">
+                <div className="w-24 h-24 rounded-full border border-[#38bdf8]/50 relative flex items-center justify-center">
+                  <div className="w-3 h-3 rounded-full bg-[#f59e0b]" />
+                </div>
+                <div className="text-[11px] font-mono text-slate-300">5.1 SURROUND SPATIAL CALIBRATED</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentStageId === 11 && (
+          <div className="space-y-3">
+            <div className="text-xs font-mono text-slate-300 font-bold">DCI MASTER DCP THEATRICAL PACKAGE:</div>
+            <div className="p-6 bg-gradient-to-b from-[#0e1d44] to-[#070e24] border-2 border-amber-500/40 rounded-2xl text-center space-y-3 shadow-2xl">
+              <Award className="w-10 h-10 text-[#f59e0b] mx-auto" />
+              <div className="text-lg font-black text-white font-mono">EXTRACTION BEACON (SCENE 12)</div>
+              <div className="text-xs text-emerald-400 font-mono">DCP SMPTE // PRORES 4444 XQ // CERTIFIED GOLD</div>
             </div>
           </div>
         )}
